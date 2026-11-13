@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Check</title>
+  <style>
+    body {font-family: Arial, sans-serif; margin: 2rem;}
+    #status {font-weight: bold;}
+  </style>
+</head>
+<body>
+  <h1>Backend Health</h1>
+  <p>Database status: <span id="db-status">Loading...</span></p>
+  <p>Message: <span id="db-value"></span></p>
+  <script>
+    // Fetch health endpoint and display values
+    fetch('/api/health')
+      .then(res => res.json())
+      .then(data => {
+        const db = data.database || {};
+        document.getElementById('db-status').textContent = db.status ?? 'unknown';
+        document.getElementById('db-value').textContent = db.value ?? '';
+      })
+      .catch(err => {
+        console.error('Health fetch error', err);
+        document.getElementById('db-status').textContent = 'error';
+        document.getElementById('db-value').textContent = err.message;
+      });
+  </script>
+</body>
+</html>

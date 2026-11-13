@@ -1,0 +1,558 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ReportSaathi API",
+    "summary": "Deterministic Vernacular Health Explainer API",
+    "description": "API contract conforming to docs/06a-api-contract.md for ReportSaathi.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "API v1 base path"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "System and Database Health Check",
+        "description": "Returns status ok, version, and database connectivity mode and health value read from SQLite WAL.",
+        "responses": {
+          "200": {
+            "description": "System is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "post": {
+        "summary": "Initialize Ephemeral Session",
+        "description": "Creates a 24-hour ephemeral session without user login.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionInitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInitResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prescriptions/upload": {
+      "post": {
+        "summary": "Upload Prescription Image for OCR Extraction",
+        "description": "Accepts prescription photo and returns fuzzy-matched whitelisted medications.",
+        "parameters": [
+          {
+            "name": "X-Session-ID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Session-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OCR extraction completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrescriptionUploadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "OCR extraction failed / blurry image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/formulary/search": {
+      "get": {
+        "summary": "Formulary Auto-Complete Search",
+        "description": "Instant search for manual prescription entry fallback.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["hi", "en"],
+              "default": "hi"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching formulary drugs list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FormularySearchItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regimens/decode": {
+      "post": {
+        "summary": "Confirm Verification & Decode Schedule",
+        "description": "Human-in-the-loop gate. Accepts user-confirmed formulary IDs and generates timeline + audio URL + statutory medical disclaimer.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegimenDecodeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Schedule decoded and audio synthesized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegimenDecodeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid formulary request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/audio/{schedule_id}.opus": {
+      "get": {
+        "summary": "Stream Synthesized Audio",
+        "description": "Streams 32kbps mono Opus audio directly for HTML5 audio player.",
+        "parameters": [
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audio stream binary",
+            "content": {
+              "audio/ogg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Audio not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DatabaseHealth": {
+        "type": "object",
+        "required": ["status", "mode", "value"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["connected", "error"]
+          },
+          "mode": {
+            "type": "string",
+            "example": "WAL"
+          },
+          "value": {
+            "type": "string",
+            "example": "SQLite WAL Connected"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status", "version", "database"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "database": {
+            "$ref": "#/components/schemas/DatabaseHealth"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error_code", "message", "timestamp"],
+        "properties": {
+          "error_code": {
+            "type": "string",
+            "example": "INVALID_SESSION"
+          },
+          "message": {
+            "type": "string",
+            "example": "Session expired or invalid"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SessionInitRequest": {
+        "type": "object",
+        "required": ["language_code"],
+        "properties": {
+          "language_code": {
+            "type": "string",
+            "enum": ["hi", "en"],
+            "example": "hi"
+          }
+        }
+      },
+      "SessionInitResponse": {
+        "type": "object",
+        "required": ["session_id", "session_token", "language_code", "expires_at"],
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "session_token": {
+            "type": "string"
+          },
+          "language_code": {
+            "type": "string",
+            "enum": ["hi", "en"]
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MatchedMedication": {
+        "type": "object",
+        "required": ["formulary_id", "detected_brand", "generic_name", "indication", "default_slot", "confidence"],
+        "properties": {
+          "formulary_id": {
+            "type": "string"
+          },
+          "detected_brand": {
+            "type": "string"
+          },
+          "generic_name": {
+            "type": "string"
+          },
+          "indication": {
+            "type": "string"
+          },
+          "default_slot": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "PrescriptionUploadResponse": {
+        "type": "object",
+        "required": ["upload_id", "status", "ocr_text_preview", "matched_medications", "unmatched_tokens"],
+        "properties": {
+          "upload_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["processing", "completed", "failed"]
+          },
+          "ocr_text_preview": {
+            "type": "string"
+          },
+          "matched_medications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchedMedication"
+            }
+          },
+          "unmatched_tokens": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FormularySearchItem": {
+        "type": "object",
+        "required": ["formulary_id", "brand_name", "generic_name", "indication", "default_slot"],
+        "properties": {
+          "formulary_id": {
+            "type": "string"
+          },
+          "brand_name": {
+            "type": "string"
+          },
+          "generic_name": {
+            "type": "string"
+          },
+          "indication": {
+            "type": "string"
+          },
+          "default_slot": {
+            "type": "string"
+          }
+        }
+      },
+      "RegimenDecodeRequest": {
+        "type": "object",
+        "required": ["confirmed_formulary_ids"],
+        "properties": {
+          "confirmed_formulary_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ScheduleSlotItem": {
+        "type": "object",
+        "required": ["formulary_id", "brand_name", "indication", "instruction"],
+        "properties": {
+          "formulary_id": {
+            "type": "string"
+          },
+          "brand_name": {
+            "type": "string"
+          },
+          "indication": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          }
+        }
+      },
+      "ScheduleTimeline": {
+        "type": "object",
+        "required": ["morning", "afternoon", "night", "benign_sensations", "red_flags"],
+        "properties": {
+          "morning": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleSlotItem"
+            }
+          },
+          "afternoon": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleSlotItem"
+            }
+          },
+          "night": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleSlotItem"
+            }
+          },
+          "benign_sensations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "red_flags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AudioPayload": {
+        "type": "object",
+        "required": ["audio_url", "duration_seconds", "format", "transcript"],
+        "properties": {
+          "audio_url": {
+            "type": "string"
+          },
+          "duration_seconds": {
+            "type": "integer"
+          },
+          "format": {
+            "type": "string"
+          },
+          "transcript": {
+            "type": "string"
+          }
+        }
+      },
+      "RegimenDecodeResponse": {
+        "type": "object",
+        "required": ["schedule_id", "share_token", "language", "disclaimer", "schedule", "audio", "whatsapp_share_url"],
+        "properties": {
+          "schedule_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "share_token": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "enum": ["hi", "en"]
+          },
+          "disclaimer": {
+            "type": "string",
+            "description": "Mandatory statutory medical disclaimer per SR-02 and FR-15"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/ScheduleTimeline"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/AudioPayload"
+          },
+          "whatsapp_share_url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

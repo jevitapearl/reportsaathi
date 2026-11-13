@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install backend dependencies
+        run: |
+          python -m venv backend/.venv
+          source backend/.venv/bin/activate
+          pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Lint with Ruff
+        run: |
+          source backend/.venv/bin/activate
+          ruff format --check .
+          ruff check .
+
+      - name: Type check with MyPy
+        run: |
+          source backend/.venv/bin/activate
+          mypy backend/app
+
+      - name: Run tests with Pytest
+        run: |
+          source backend/.venv/bin/activate
+          pytest -q backend/tests
+
+      - name: Build frontend (optional)
+        run: |
+          # No build step required for static HTML/JS
+          echo "Frontend is static, no build needed"
+
+      - name: Deploy to GitHub Pages (optional)
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/public
