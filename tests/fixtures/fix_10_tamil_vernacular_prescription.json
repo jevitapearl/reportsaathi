@@ -1,0 +1,54 @@
+{
+  "fixture_id": "FIX_10_TAMIL_VERNACULAR_PRESCRIPTION",
+  "description": "Bilingual South Indian prescription slip (Tamil + English) from government hospital",
+  "patient": {
+    "anonymized_id": "PT_CHE_2209",
+    "age": 59,
+    "gender": "Female",
+    "location": "Chennai, Tamil Nadu",
+    "clinical_setting": "Government Stanley Medical College Hospital"
+  },
+  "raw_ocr_text": "சென்னை அரசு பொது மருத்துவமனை\nOPD No: 44921\n1. Tab Metformin 500 mg - 1 காலை / 1 இரவு (காலை & இரவு உணவுக்குப் பின்)\n2. Tab Amlodipine 5 mg - 1 காலை (காலை உணவுடன்)\n3. Tab Eltroxin 50 mcg - 1 அதிகாலை வெறும் வயிற்றில்",
+  "simulated_image_metadata": {
+    "filename": "prescription_che_2209.jpg",
+    "resolution": "1920x1080",
+    "file_size_kb": 275,
+    "mean_sharpness_score": 76.5
+  },
+  "expected_extraction": [
+    {
+      "formulary_id": "FORM_THYROXINE_50",
+      "generic_name": "Levothyroxine (50mcg)",
+      "detected_slot": "morning_empty_stomach",
+      "confidence": 0.92
+    },
+    {
+      "formulary_id": "FORM_AMLODIPINE_5",
+      "generic_name": "Amlodipine (5mg)",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.94
+    },
+    {
+      "formulary_id": "FORM_METFORMIN_500",
+      "generic_name": "Metformin (500mg)",
+      "detected_slot": "morning_and_night_with_food",
+      "confidence": 0.95
+    }
+  ],
+  "expected_chronotherapy_schedule": {
+    "morning": [
+      "Eltroxin 50 (வெறும் வயிற்றில் / Empty stomach)",
+      "Amlodipine 5 (காலை உணவு / Breakfast)",
+      "Metformin 500 (காலை உணவு / Breakfast)"
+    ],
+    "afternoon": [],
+    "night": [
+      "Metformin 500 (இரவு உணவு / Dinner)"
+    ]
+  },
+  "safety_checks": {
+    "non_latin_script_rendering_verified": true,
+    "bilingual_token_matching_verified": true,
+    "off_formulary_flags": 0
+  }
+}

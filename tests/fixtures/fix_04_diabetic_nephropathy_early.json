@@ -1,0 +1,55 @@
+{
+  "fixture_id": "FIX_04_DIABETIC_NEPHROPATHY_EARLY",
+  "description": "Diabetic patient with microalbuminuria on renal-protective SGLT2i + ARB combination",
+  "patient": {
+    "anonymized_id": "PT_VAR_7731",
+    "age": 61,
+    "gender": "Male",
+    "location": "Varanasi, Uttar Pradesh",
+    "clinical_setting": "Private Endocrinology OPD"
+  },
+  "raw_ocr_text": "Rx:\nTab Forxiga 10mg (Dapagliflozin) - 1 OD morning with water\nTab Trajenta 5mg (Linagliptin) - 1 OD morning\nTab Telma 40mg - 1 OD morning\nEnsure 2.5L water daily. Watch for fungal infections.",
+  "simulated_image_metadata": {
+    "filename": "prescription_var_7731.jpg",
+    "resolution": "2048x1536",
+    "file_size_kb": 290,
+    "mean_sharpness_score": 69.5
+  },
+  "expected_extraction": [
+    {
+      "formulary_id": "FORM_DAPAGLIFLOZIN_10",
+      "brand_name": "Forxiga 10",
+      "generic_name": "Dapagliflozin (10mg)",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.91
+    },
+    {
+      "formulary_id": "FORM_LINAGLIPTIN_5",
+      "brand_name": "Trajenta 5",
+      "generic_name": "Linagliptin (5mg)",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.93
+    },
+    {
+      "formulary_id": "FORM_TELMA_40",
+      "brand_name": "Telma 40",
+      "generic_name": "Telmisartan (40mg)",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.96
+    }
+  ],
+  "expected_chronotherapy_schedule": {
+    "morning": [
+      "Forxiga 10 (morning with plenty of water)",
+      "Trajenta 5 (morning)",
+      "Telma 40 (after breakfast)"
+    ],
+    "afternoon": [],
+    "night": []
+  },
+  "safety_checks": {
+    "hydration_euglycemic_dka_warning": true,
+    "genital_hygiene_uti_warning": true,
+    "off_formulary_flags": 0
+  }
+}

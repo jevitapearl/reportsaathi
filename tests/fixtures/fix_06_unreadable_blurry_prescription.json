@@ -1,0 +1,29 @@
+{
+  "fixture_id": "FIX_06_UNREADABLE_BLURRY_PRESCRIPTION",
+  "description": "Failure test case: Severely blurry, low-light image triggering OCR sharpness threshold failure",
+  "patient": {
+    "anonymized_id": "PT_KNP_1120",
+    "age": 60,
+    "gender": "Male",
+    "location": "Kanpur, Uttar Pradesh",
+    "clinical_setting": "Government Polyclinic"
+  },
+  "raw_ocr_text": "~~#@! .. G..min... 1 tab .. ~~~ ?? T..lv.. ???",
+  "simulated_image_metadata": {
+    "filename": "prescription_knp_1120_blurry.jpg",
+    "resolution": "640x480",
+    "file_size_kb": 42,
+    "mean_sharpness_score": 12.3
+  },
+  "expected_extraction": [],
+  "expected_api_response": {
+    "status": "error",
+    "error_code": "OCR_EXTRACTION_FAILED",
+    "http_status": 422,
+    "fallback_route": "manual_search_picker"
+  },
+  "safety_checks": {
+    "zero_hallucinations_on_noise": true,
+    "rejection_of_subthreshold_image": true
+  }
+}

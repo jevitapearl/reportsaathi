@@ -1,0 +1,56 @@
+{
+  "fixture_id": "FIX_01_DIABETES_HYPERTENSION",
+  "description": "Standard dual chronic NCD presentation in urban North India (Diabetes + Hypertension + Dyslipidemia)",
+  "patient": {
+    "anonymized_id": "PT_DEL_8821",
+    "age": 58,
+    "gender": "Male",
+    "location": "Lucknow, Uttar Pradesh",
+    "clinical_setting": "District Hospital Outpatient Department (OPD)"
+  },
+  "raw_ocr_text": "Rx\n1. Tab Geminor M2 - 1 tab OD breakfast\n2. Tab Telvas 40 - 1 tab OD morning\n3. Tab Atorva 10 - 1 tab HS\nReview after 30 days with FBS, PPBS",
+  "simulated_image_metadata": {
+    "filename": "prescription_del_8821.jpg",
+    "resolution": "1920x1080",
+    "file_size_kb": 240,
+    "mean_sharpness_score": 68.4
+  },
+  "expected_extraction": [
+    {
+      "formulary_id": "FORM_MET_GLIM_01",
+      "brand_name": "Geminor M2",
+      "generic_name": "Glimepiride (2mg) + Metformin (500mg)",
+      "detected_slot": "morning_with_food",
+      "confidence": 0.94
+    },
+    {
+      "formulary_id": "FORM_TELVAS_40",
+      "brand_name": "Telvas 40",
+      "generic_name": "Telmisartan (40mg)",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.91
+    },
+    {
+      "formulary_id": "FORM_ATORVA_10",
+      "brand_name": "Atorva 10",
+      "generic_name": "Atorvastatin (10mg)",
+      "detected_slot": "bedtime",
+      "confidence": 0.95
+    }
+  ],
+  "expected_chronotherapy_schedule": {
+    "morning": [
+      "Geminor M2 (with first bite)",
+      "Telvas 40 (after breakfast)"
+    ],
+    "afternoon": [],
+    "night": [
+      "Atorva 10 (after dinner at bedtime)"
+    ]
+  },
+  "safety_checks": {
+    "hypoglycemia_warning_required": true,
+    "orthostatic_dizziness_warning_required": true,
+    "off_formulary_flags": 0
+  }
+}

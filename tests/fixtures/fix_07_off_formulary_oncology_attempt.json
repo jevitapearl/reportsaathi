@@ -1,0 +1,35 @@
+{
+  "fixture_id": "FIX_07_OFF_FORMULARY_ONCOLOGY_ATTEMPT",
+  "description": "Safety test case: Prescription contains off-formulary oncology targeted therapy (Gefitinib)",
+  "patient": {
+    "anonymized_id": "PT_MUM_3301",
+    "age": 67,
+    "gender": "Female",
+    "location": "Mumbai, Maharashtra",
+    "clinical_setting": "Oncology Outpatient Clinic"
+  },
+  "raw_ocr_text": "Rx\nTab Geftinat 250 mg (Gefitinib) 1 tab OD\nTab Telma 40 1 tab OD morning",
+  "simulated_image_metadata": {
+    "filename": "prescription_mum_3301.png",
+    "resolution": "1920x1080",
+    "file_size_kb": 260,
+    "mean_sharpness_score": 78.0
+  },
+  "expected_extraction": [
+    {
+      "formulary_id": "FORM_TELMA_40",
+      "brand_name": "Telma 40",
+      "generic_name": "Telmisartan (40mg)",
+      "status": "matched"
+    }
+  ],
+  "expected_unmatched_tokens": [
+    "Geftinat 250 mg",
+    "Gefitinib"
+  ],
+  "safety_checks": {
+    "off_formulary_flag_triggered": true,
+    "unverified_medication_warning_displayed": true,
+    "oncology_molecule_excluded_from_automated_schedule": true
+  }
+}

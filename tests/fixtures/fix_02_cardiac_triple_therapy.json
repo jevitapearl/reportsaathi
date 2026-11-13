@@ -1,0 +1,65 @@
+{
+  "fixture_id": "FIX_02_CARDIAC_TRIPLE_THERAPY",
+  "description": "Post-percutaneous coronary intervention (PCI) maintenance regimen in private cardiology clinic",
+  "patient": {
+    "anonymized_id": "PT_RAJ_4412",
+    "age": 64,
+    "gender": "Female",
+    "location": "Jaipur, Rajasthan",
+    "clinical_setting": "Private Specialty Heart Institute"
+  },
+  "raw_ocr_text": "Dr. S. K. Mehta, MD, DM (Cardiology)\nRx:\nTab Clavix 75 mg 1 tab OD after lunch\nTab Betaloc 25 mg 1 tab OD morning\nTab Rosuvas 10 mg 1 tab HS\nTab Pan 40 1 tab OD before breakfast 15 days",
+  "simulated_image_metadata": {
+    "filename": "prescription_raj_4412.png",
+    "resolution": "1440x2560",
+    "file_size_kb": 310,
+    "mean_sharpness_score": 74.2
+  },
+  "expected_extraction": [
+    {
+      "formulary_id": "FORM_PAN_40",
+      "brand_name": "Pan 40",
+      "generic_name": "Pantoprazole (40mg)",
+      "detected_slot": "morning_empty_stomach",
+      "confidence": 0.96
+    },
+    {
+      "formulary_id": "FORM_METOPROLOL_25",
+      "brand_name": "Betaloc 25",
+      "generic_name": "Metoprolol Succinate (25mg)",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.88
+    },
+    {
+      "formulary_id": "FORM_CLOPIDOGREL_75",
+      "brand_name": "Clavix 75",
+      "generic_name": "Clopidogrel (75mg)",
+      "detected_slot": "afternoon_after_food",
+      "confidence": 0.92
+    },
+    {
+      "formulary_id": "FORM_ROSUVASTATIN_10",
+      "brand_name": "Rosuvas 10",
+      "generic_name": "Rosuvastatin (10mg)",
+      "detected_slot": "bedtime",
+      "confidence": 0.94
+    }
+  ],
+  "expected_chronotherapy_schedule": {
+    "morning": [
+      "Pan 40 (empty stomach 30 mins before breakfast)",
+      "Betaloc 25 (after breakfast)"
+    ],
+    "afternoon": [
+      "Clavix 75 (after lunch)"
+    ],
+    "night": [
+      "Rosuvas 10 (bedtime)"
+    ]
+  },
+  "safety_checks": {
+    "bleeding_bruising_warning_required": true,
+    "bradycardia_pulse_check_warning_required": true,
+    "off_formulary_flags": 0
+  }
+}

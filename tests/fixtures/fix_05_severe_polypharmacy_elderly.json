@@ -1,0 +1,75 @@
+{
+  "fixture_id": "FIX_05_SEVERE_POLYPHARMACY_ELDERLY",
+  "description": "Complex polypharmacy in elderly male (72) with metabolic syndrome and osteoarthritis",
+  "patient": {
+    "anonymized_id": "PT_BHO_9918",
+    "age": 72,
+    "gender": "Male",
+    "location": "Bhopal, Madhya Pradesh",
+    "clinical_setting": "Multi-Specialty Corporate Hospital"
+  },
+  "raw_ocr_text": "DISCHARGE SUMMARY / CONTINUATION SHEET\n1. Tab Geminor M2 1-0-0 (Breakfast)\n2. Tab Telvas 40 1-0-0 (Morning)\n3. Tab Atorva 20 0-0-1 (Bedtime)\n4. Tab Pan 40 1-0-0 (Empty Stomach)\n5. Tab Ecosprin 75 0-1-0 (After Lunch)\n6. Tab Shelcal 500 0-1-0 (After Lunch)",
+  "simulated_image_metadata": {
+    "filename": "prescription_bho_9918.png",
+    "resolution": "1920x1080",
+    "file_size_kb": 340,
+    "mean_sharpness_score": 85.1
+  },
+  "expected_extraction": [
+    {
+      "formulary_id": "FORM_PAN_40",
+      "brand_name": "Pan 40",
+      "detected_slot": "morning_empty_stomach",
+      "confidence": 0.97
+    },
+    {
+      "formulary_id": "FORM_MET_GLIM_01",
+      "brand_name": "Geminor M2",
+      "detected_slot": "morning_with_food",
+      "confidence": 0.95
+    },
+    {
+      "formulary_id": "FORM_TELVAS_40",
+      "brand_name": "Telvas 40",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.94
+    },
+    {
+      "formulary_id": "FORM_ECOSPRIN_75",
+      "brand_name": "Ecosprin 75",
+      "detected_slot": "afternoon_after_food",
+      "confidence": 0.96
+    },
+    {
+      "formulary_id": "FORM_SHELCAL_500",
+      "brand_name": "Shelcal 500",
+      "detected_slot": "afternoon_after_food",
+      "confidence": 0.92
+    },
+    {
+      "formulary_id": "FORM_ATORVA_20",
+      "brand_name": "Atorva 20",
+      "detected_slot": "bedtime",
+      "confidence": 0.96
+    }
+  ],
+  "expected_chronotherapy_schedule": {
+    "morning": [
+      "Pan 40 (empty stomach 30 mins before food)",
+      "Geminor M2 (with first bite)",
+      "Telvas 40 (after breakfast)"
+    ],
+    "afternoon": [
+      "Ecosprin 75 (after lunch with water)",
+      "Shelcal 500 (after lunch)"
+    ],
+    "night": [
+      "Atorva 20 (after dinner at bedtime)"
+    ]
+  },
+  "safety_checks": {
+    "max_drug_limit_tested": 6,
+    "aspirin_calcium_co_administration_checked": true,
+    "off_formulary_flags": 0
+  }
+}

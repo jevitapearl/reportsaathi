@@ -1,0 +1,47 @@
+{
+  "fixture_id": "FIX_03_HYPOTHYROID_HYPERTENSION",
+  "description": "Middle-aged female with primary hypothyroidism and essential hypertension",
+  "patient": {
+    "anonymized_id": "PT_DEL_1092",
+    "age": 52,
+    "gender": "Female",
+    "location": "South Delhi",
+    "clinical_setting": "Community Health Centre"
+  },
+  "raw_ocr_text": "Rx\n1. Tab Thyronorm 50 mcg 1 tab OD early morning empty stomach (strictly 30 mins before tea/milk)\n2. Tab Amlopres 5 mg 1 tab OD morning after breakfast\nRepeat TSH, BP log after 6 weeks.",
+  "simulated_image_metadata": {
+    "filename": "prescription_del_1092.jpg",
+    "resolution": "1920x1080",
+    "file_size_kb": 185,
+    "mean_sharpness_score": 82.0
+  },
+  "expected_extraction": [
+    {
+      "formulary_id": "FORM_THYROXINE_50",
+      "brand_name": "Thyronorm 50",
+      "generic_name": "Levothyroxine Sodium (50mcg)",
+      "detected_slot": "morning_empty_stomach",
+      "confidence": 0.97
+    },
+    {
+      "formulary_id": "FORM_AMLODIPINE_5",
+      "brand_name": "Amlopres 5",
+      "generic_name": "Amlodipine Besylate (5mg)",
+      "detected_slot": "morning_after_food",
+      "confidence": 0.93
+    }
+  ],
+  "expected_chronotherapy_schedule": {
+    "morning": [
+      "Thyronorm 50 (strictly empty stomach with plain water)",
+      "Amlopres 5 (after breakfast)"
+    ],
+    "afternoon": [],
+    "night": []
+  },
+  "safety_checks": {
+    "empty_stomach_absorption_warning": true,
+    "ankle_edema_reassurance_required": true,
+    "off_formulary_flags": 0
+  }
+}
